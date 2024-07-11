@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alphabet Frequency Analysis</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    #inputContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      background-color: rgba(255, 255, 255, 0.471);
+      position: absolute;
+      top: 10vh;
+      padding: 10px;
+    }
+    #canvasContainer {
+      overflow-x: auto;
+      width: 100%;
+    }
+    canvas {
+      min-width: 1000px;
+    }
+  </style>
+</head>
+<body>
+  <div id="inputContainer">
+    <input type="text" id="textInput" placeholder="Enter text here" style="padding: 10px; width: 300px;">
+    <button onclick="analyzeText()" style="margin-top: 10px; padding: 10px;">Analyze</button>
+  </div>
+  <div id="canvasContainer">
+    <!-- The canvas will be created here by p5.js -->
+  </div>
+
+  <script>
+    let inputText = "";
+
+    function analyzeText() {
+      inputText = document.getElementById('textInput').value;
+      setup(); // Call setup to redraw the canvas with new text input
+    }
+
+    // p5.js setup function to initialize the canvas
+    function setup() {
+      let canvasContainer = document.getElementById('canvasContainer');
+      let canvas = createCanvas(1000, 600);
+      canvas.parent(canvasContainer);
+      background(255); // Clear the canvas
+
+      let sampleText = inputText;
+
+      // Remove all empty spaces and convert to lowercase for uniformity
+      sampleText = sampleText.replace(/\s+/g, '').toLowerCase();
+
+      // Calculate the total number of alphabets
+      let totalAlphabets = sampleText.length;
+
+      // Initialize a frequency object
+      let frequency = {};
+      for (let char of sampleText) {
+        if (char.match(/[a-z]/)) { // Ensure the character is an alphabet
+          if (frequency[char]) {
+            frequency[char]++;
+          } else {
+            frequency[char] = 1;
+          }
+        }
+      }
+
+      // Sort keys alphabetically
+      let keys = Object.keys(frequency).sort();
+      // Retrieve values based on sorted keys
+      let values = keys.map(key => frequency[key]);
+      // Find the maximum frequency for scaling
+      let maxFreq = Math.max(...values);
+
+      // Draw the bar chart
+      let barWidth = width / keys.length;
+      for (let i = 0; i < keys.length; i++) {
+        let barHeight = map(values[i], 0, maxFreq, 0, height);
+        noStroke();
+        fill(150, 150, 255);
+        rect(i * barWidth, height - barHeight, barWidth - 2, barHeight);
+
+        // Draw the alphabet and frequency number at the base of the bar
+        fill(0);
+        textAlign(CENTER, BOTTOM);
+        textSize(12);
+
+        text(values[i], i * barWidth + barWidth / 2, height - 5); // Frequency at the base
+
+        text(keys[i], i * barWidth + barWidth / 2, height - 20); // Alphabet at the base
+      }
+    }
+
+    // p5.js draw function (not used in this example but required for p5.js)
+    function draw() {
+      // No need to draw continuously, so leaving it empty
+    }
+  </script>
+</body>
+</html>
